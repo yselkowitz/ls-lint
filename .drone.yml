@@ -50,6 +50,8 @@ steps:
         - ls-lint-darwin-arm64
         - ls-lint-linux
         - ls-lint-linux-arm64
+        - ls-lint-linux-ppc64le
+        - ls-lint-linux-s390x
         - ls-lint-windows.exe
     when:
       event: tag
@@ -130,10 +132,72 @@ steps:
 ---
 kind: pipeline
 type: docker
+name: docker-linux-ppc64le
+depends_on:
+  - main
+trigger:
+  event:
+    - tag
+
+platform:
+  os: linux
+  arch: ppc64le
+
+steps:
+  - name: build
+    image: golang
+    commands:
+      - make build
+  - name: docker hub
+    image: plugins/docker:linux-ppc64le
+    settings:
+      username: loeffel
+      password:
+        from_secret: DOCKER_PASSWORD
+      dockerfile: docker/Dockerfile.ppc64le
+      auto_tag: true
+      auto_tag_suffix: linux-ppc64le
+      repo: lslintorg/ls-lint
+
+---
+kind: pipeline
+type: docker
+name: docker-linux-s390x
+depends_on:
+  - main
+trigger:
+  event:
+    - tag
+
+platform:
+  os: linux
+  arch: s390x
+
+steps:
+  - name: build
+    image: golang
+    commands:
+      - make build
+  - name: docker hub
+    image: plugins/docker:linux-s390x
+    settings:
+      username: loeffel
+      password:
+        from_secret: DOCKER_PASSWORD
+      dockerfile: docker/Dockerfile.s390x
+      auto_tag: true
+      auto_tag_suffix: linux-s390x
+      repo: lslintorg/ls-lint
+
+---
+kind: pipeline
+type: docker
 name: docker-manifest
 depends_on:
   - docker-linux-amd64
   - docker-linux-arm64
+  - docker-linux-ppc64le
+  - docker-linux-s390x
 trigger:
   event:
     - tag

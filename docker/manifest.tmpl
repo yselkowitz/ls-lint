@@ -17,3 +17,13 @@ manifests:
       architecture: arm64
       os: linux
       variant: v8
+  -
+    image: lslintorg/ls-lint:{{#if build.tag}}{{trimPrefix "v" build.tag}}-{{/if}}linux-ppc64le
+    platform:
+      architecture: ppc64le
+      os: linux
+  -
+    image: lslintorg/ls-lint:{{#if build.tag}}{{trimPrefix "v" build.tag}}-{{/if}}linux-s390x
+    platform:
+      architecture: s390x
+      os: linux
